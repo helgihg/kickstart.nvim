@@ -160,6 +160,25 @@ require('lazy').setup({
   },
 
   {
+    -- File picker: https://github.com/nvim-neo-tree/neo-tree.nvim
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+    },
+    opts = {
+      close_if_last_window = true,
+      window = {
+        mappings = {
+          ["Z"] = "expand_all_nodes",
+        },
+      },
+    },
+  },
+
+  {
     -- ToggleTerm
     -- https://github.com/akinsho/toggleterm.nvim
     'akinsho/toggleterm.nvim',
@@ -288,6 +307,8 @@ vim.o.termguicolors = true
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
+vim.keymap.set('n', 'q', ':Neotree toggle<CR>', { noremap = true, silent = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
