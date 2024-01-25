@@ -141,6 +141,14 @@ require('lazy').setup({
   },
 
   {
+    -- Markdown
+    'preservim/vim-markdown',
+    config = function()
+        vim.g.vim_markdown_folding_disabled = 1
+    end
+  },
+
+  {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
