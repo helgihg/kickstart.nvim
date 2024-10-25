@@ -501,11 +501,24 @@ end
 local servers = {
   -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
+  pyright = {
+    python = {
+      analysis = {
+        diagnosticSeverityOverrides = {
+          reportOptionalMemberAccess = "none",
+          reportOptionalSubscript = "none",
+          reportArgumentType = "none",
+          reportCallIssue = "none",
+          reportGeneralTypeIssues = "none",
+        },
+      },
+    },
+    reportOptionalMemberAccess = "none",
+  },
   rust_analyzer = {},
-  tsserver = {},
+  ts_ls = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
-  pylsp = {},
+  -- pylsp = {},
 
   lua_ls = {
     Lua = {
