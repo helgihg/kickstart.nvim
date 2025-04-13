@@ -268,6 +268,22 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
 }, {})
 
+-- Automatically discover light/dark mode.
+local function theme_switched()
+  local handle = io.popen("xfconf-query -c xsettings -p /Net/ThemeName")
+  if not handle then return end
+
+  local theme = handle:read("*a")
+  handle:close()
+
+  if string.match(string.lower(theme), "dark") then
+    vim.o.background = "dark"
+  else
+    vim.o.background = "light"
+  end
+end
+_G.ThemeSwitched = theme_switched
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -600,6 +616,9 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+-- Configure theme according to light/dark setting.
+theme_switched()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
