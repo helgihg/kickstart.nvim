@@ -531,7 +531,13 @@ local servers = {
     },
     reportOptionalMemberAccess = "none",
   },
-  rust_analyzer = {},
+  rust_analyzer = {
+    completion = {
+      autoimport = {
+        enable = false,
+      },
+    },
+  },
   ts_ls = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
   -- pylsp = {},
