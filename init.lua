@@ -81,7 +81,100 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', config = true },
+      {
+        'williamboman/mason.nvim',
+        config = function()
+          require('mason').setup()
+        end
+      },
+      {
+        "mfussenegger/nvim-dap",
+        config = function()
+          local dap = require("dap")
+
+          dap.adapters.codelldb = {
+            type = "server",
+            port = "${port}",
+            executable = {
+              command = vim.fn.stdpath("data") .. "/mason/bin/codelldb",
+              args = { "--port", "${port}" },
+            },
+          }
+
+          dap.configurations.cpp = {
+            {
+              name = "Launch file",
+              type = "codelldb",
+              request = "launch",
+              program = function()
+                return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+              end,
+              cwd = "${workspaceFolder}",
+              stopOnEntry = false,
+              args = {},
+            },
+          }
+
+          dap.configurations.c = dap.configurations.cpp
+          dap.configurations.rust = dap.configurations.cpp
+          dap.configurations.jai = dap.configurations.cpp
+
+          -- Support for LaunchJS config.
+          require("dap.ext.vscode").load_launchjs()
+
+          -- Debugging keymap.
+          vim.keymap.set("n", "<F5>", function() dap.continue() end)
+          vim.keymap.set("n", "<F10>", function() dap.step_over() end)
+          vim.keymap.set("n", "<F11>", function() dap.step_into() end)
+          vim.keymap.set("n", "<F12>", function() dap.step_out() end)
+          vim.keymap.set("n", "<leader>b", function() dap.toggle_breakpoint() end)
+          vim.keymap.set("n", "<leader>B", function()
+            dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+          end)
+
+        end,
+      },
+      {
+        "jay-babu/mason-nvim-dap.nvim",
+        dependencies = {
+          "mfussenegger/nvim-dap",
+          "williamboman/mason.nvim",
+        },
+        config = function()
+          require("mason-nvim-dap").setup({
+            ensure_installed = { "codelldb" },
+            automatic_installation = true,
+          })
+        end,
+      },
+      {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {
+          "mfussenegger/nvim-dap",
+          "nvim-neotest/nvim-nio",
+        },
+        config = function()
+          local dap, dapui = require("dap"), require("dapui")
+          dapui.setup()
+
+          -- open Dap UI automatically when debug starts (e.g. after <F5>)
+          dap.listeners.before.attach.dapui_config = function()
+              dapui.open()
+          end
+          dap.listeners.before.launch.dapui_config = function()
+              dapui.open()
+          end
+
+          -- close Dap UI with :DapCloseUI
+          vim.api.nvim_create_user_command("DapCloseUI", function()
+              require("dapui").close()
+          end, {})
+
+          -- use <Alt-e> to eval expressions
+          vim.keymap.set({ 'n', 'v' }, '<M-e>', function() require('dapui').eval() end)
+        end,
+      },
+
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
@@ -165,6 +258,10 @@ require('lazy').setup({
   {
     -- Transparent background
     'xiyaowong/transparent.nvim',
+  },
+
+  {
+    'rluba/jai.vim',
   },
 
   {
@@ -268,22 +365,6 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
 }, {})
 
--- Automatically discover light/dark mode.
-local function theme_switched()
-  local handle = io.popen("xfconf-query -c xsettings -p /Net/ThemeName")
-  if not handle then return end
-
-  local theme = handle:read("*a")
-  handle:close()
-
-  if string.match(string.lower(theme), "dark") then
-    vim.o.background = "dark"
-  else
-    vim.o.background = "light"
-  end
-end
-_G.ThemeSwitched = theme_switched
-
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -339,6 +420,14 @@ vim.keymap.set('n', 'q', ':Neotree toggle<CR>', { noremap = true, silent = true 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+
+
+
+
+
+
+
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -620,9 +709,6 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
-
--- Configure theme according to light/dark setting.
-theme_switched()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
