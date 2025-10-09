@@ -30,8 +30,7 @@ end
 local function remote_prefix(commit)
   local dir = vim.fn.expand("%:p:h")
   local out = vim.fn.systemlist({ "git", "-C", dir, "config", "--get", "remote.origin.url" })
-  local url = (out[1] or ""):gsub("/$", "")
-  url = url:gsub("%.git$", "")
+  local url = (out[1] or ""):gsub("/$", ""):gsub("%.git$", "")
   if url:match("^git@") then
     local host, path = url:match("^git@([^:]+):(.+)$")
     if host and path then
@@ -43,11 +42,32 @@ local function remote_prefix(commit)
   return ""
 end
 
-vim.keymap.set("n", "<leader>l", function()
+local function build_url(range_start, range_end)
   local commit = git_commit()
   local prefix = remote_prefix(commit)
-  local s = ("%s%s#L%d"):format(prefix, repo_relpath(), vim.fn.line("."))
+  local file = repo_relpath()
+  local anchor = (range_end and range_end ~= range_start)
+      and ("#L" .. range_start .. "-L" .. range_end)
+      or  ("#L" .. range_start)
+  return prefix .. file .. anchor
+end
+
+-- Normal mode: single cursor line -> #L{line}
+vim.keymap.set("n", "<leader>l", function()
+  local line = vim.fn.line(".")
+  local s = build_url(line, line)
   vim.fn.setreg("+", s)
   print(s)
-end, { desc = "Copy remote:file@commit#Lline" })
+end, { desc = "Copy remote:file#Lline (commit)" })
 
+-- Visual mode: selected line range -> #L{start}-L{end}
+vim.keymap.set("x", "<leader>l", function()
+  local a = vim.fn.line("'<")
+  local b = vim.fn.line("'>")
+  if a > b then a, b = b, a end
+  local s = build_url(a, b)
+  vim.fn.setreg("+", s)
+  print(s)
+end, { desc = "Copy remote:file#Lstart-Lend (commit)" })
+
+return {}
