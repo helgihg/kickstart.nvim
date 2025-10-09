@@ -8,9 +8,9 @@ local function git_root()
   end
 end
 
-local function git_branch()
+local function git_commit()
   local dir = vim.fn.expand("%:p:h")
-  local out = vim.fn.systemlist({ "git", "-C", dir, "rev-parse", "--abbrev-ref", "HEAD" })
+  local out = vim.fn.systemlist({ "git", "-C", dir, "rev-parse", "HEAD" })
   if vim.v.shell_error == 0 and out[1] and out[1] ~= "" then
     return out[1]
   end
@@ -27,28 +27,27 @@ local function repo_relpath()
   end
 end
 
-local function remote_prefix(branch)
+local function remote_prefix(commit)
   local dir = vim.fn.expand("%:p:h")
   local out = vim.fn.systemlist({ "git", "-C", dir, "config", "--get", "remote.origin.url" })
   local url = (out[1] or ""):gsub("/$", "")
-  url = url:gsub("%.git$", "") -- remove .git suffix
+  url = url:gsub("%.git$", "")
   if url:match("^git@") then
     local host, path = url:match("^git@([^:]+):(.+)$")
     if host and path then
-      return ("https://%s/%s/src/%s/"):format(host, path, branch)
+      return ("https://%s/%s/src/commit/%s/"):format(host, path, commit)
     end
   elseif url:match("^https?://") then
-    return ("%s/src/%s/"):format(url, branch)
+    return ("%s/src/commit/%s/"):format(url, commit)
   end
   return ""
 end
 
 vim.keymap.set("n", "<leader>l", function()
-  local branch = git_branch()
-  local prefix = remote_prefix(branch)
-  local payload = ("%s#L%d"):format(repo_relpath(), vim.fn.line("."))
-  local s = prefix .. payload
+  local commit = git_commit()
+  local prefix = remote_prefix(commit)
+  local s = ("%s%s#L%d"):format(prefix, repo_relpath(), vim.fn.line("."))
   vim.fn.setreg("+", s)
   print(s)
-end, { desc = "Copy remote:file#Lline" })
+end, { desc = "Copy remote:file@commit#Lline" })
 
