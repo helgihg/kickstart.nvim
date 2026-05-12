@@ -48,7 +48,6 @@ local function build_url(range_start, range_end)
   return prefix .. file .. anchor
 end
 
--- Normal mode: single cursor line -> #L{line}
 vim.keymap.set('n', '<leader>l', function()
   local line = vim.fn.line '.'
   local s = build_url(line, line)
@@ -56,7 +55,6 @@ vim.keymap.set('n', '<leader>l', function()
   print(s)
 end, { desc = 'Copy remote:file#Lline (commit)' })
 
--- Visual mode: selected line range -> #L{start}-L{end}
 vim.keymap.set('x', '<leader>l', function()
   local a = vim.fn.line "'<"
   local b = vim.fn.line "'>"
@@ -67,5 +65,3 @@ vim.keymap.set('x', '<leader>l', function()
   vim.fn.setreg('+', s)
   print(s)
 end, { desc = 'Copy remote:file#Lstart-Lend (commit)' })
-
-return {}
