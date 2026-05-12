@@ -1,11 +1,15 @@
-vim.pack.add { 'https://github.com/ellisonleao/gruvbox.nvim' }
-require('gruvbox').setup {
-  italic = {
-    strings = false,
-    emphasis = false,
-    comments = false,
-    operators = false,
-    folds = false,
-  },
+return {
+  packs = { 'https://github.com/ellisonleao/gruvbox.nvim' },
+  setup = function()
+    require('gruvbox').setup {
+      italic = {
+        strings = false,
+        emphasis = false,
+        comments = false,
+        operators = false,
+        folds = false,
+      },
+    }
+    vim.cmd.colorscheme 'gruvbox'
+  end,
 }
-vim.cmd.colorscheme 'gruvbox'

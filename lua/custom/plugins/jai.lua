@@ -1,1 +1,3 @@
-vim.pack.add { 'https://github.com/rluba/jai.vim' }
+return {
+  packs = { 'https://github.com/rluba/jai.vim' },
+}

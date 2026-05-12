@@ -1,1 +1,6 @@
-vim.pack.add { 'https://github.com/xiyaowong/transparent.nvim' }
+return {
+  packs = { 'https://github.com/xiyaowong/transparent.nvim' },
+  setup = function()
+    require('transparent').setup()
+  end,
+}

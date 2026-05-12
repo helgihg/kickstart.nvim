@@ -1,2 +1,6 @@
-vim.pack.add { 'https://github.com/greggh/claude-code.nvim' }
-require('claude-code').setup()
+return {
+  packs = { 'https://github.com/greggh/claude-code.nvim' },
+  setup = function()
+    require('claude-code').setup()
+  end,
+}

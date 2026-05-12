@@ -1,13 +1,21 @@
--- You can add your own plugins here or in other files in this directory!
---  I promise not to create any merge conflicts in this directory :)
---
--- See the kickstart.nvim README for more information
-
--- Iterate over all Lua files in the plugins directory and load them
 local plugins_dir = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'custom', 'plugins')
+local all_packs = {}
+local all_setups = {}
+
 for file_name, type in vim.fs.dir(plugins_dir) do
   if type == 'file' and file_name:match '%.lua$' and file_name ~= 'init.lua' then
-    local module = file_name:gsub('%.lua$', '')
-    require('custom.plugins.' .. module)
+    local spec = require('custom.plugins.' .. file_name:gsub('%.lua$', ''))
+    for _, pack in ipairs(spec.packs or {}) do
+      table.insert(all_packs, pack)
+    end
+    if spec.setup then
+      table.insert(all_setups, spec.setup)
+    end
   end
+end
+
+vim.pack.add(all_packs)
+
+for _, setup in ipairs(all_setups) do
+  setup()
 end

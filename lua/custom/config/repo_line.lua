@@ -58,9 +58,7 @@ end, { desc = 'Copy remote:file#Lline (commit)' })
 vim.keymap.set('x', '<leader>l', function()
   local a = vim.fn.line "'<"
   local b = vim.fn.line "'>"
-  if a > b then
-    a, b = b, a
-  end
+  if a > b then a, b = b, a end
   local s = build_url(a, b)
   vim.fn.setreg('+', s)
   print(s)
