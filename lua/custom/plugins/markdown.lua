@@ -23,6 +23,7 @@ return {
           vim.api.nvim_win_set_width(toc_win, max_width + 2)
           vim.api.nvim_set_current_win(prev_win)
         end, {})
+        vim.cmd 'Toc'
       end,
     })
   end,
