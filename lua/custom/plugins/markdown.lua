@@ -15,6 +15,12 @@ return {
           local toc_win = vim.api.nvim_get_current_win()
           vim.api.nvim_set_option_value('number', false, { win = toc_win })
           vim.api.nvim_set_option_value('relativenumber', false, { win = toc_win })
+          local lines = vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(toc_win), 0, -1, false)
+          local max_width = 0
+          for _, line in ipairs(lines) do
+            max_width = math.max(max_width, vim.fn.strdisplaywidth(line))
+          end
+          vim.api.nvim_win_set_width(toc_win, max_width + 2)
           vim.api.nvim_set_current_win(prev_win)
         end, {})
       end,
