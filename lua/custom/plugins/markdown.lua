@@ -22,7 +22,17 @@ return {
           end
           vim.api.nvim_win_set_width(toc_win, max_width + 2)
           vim.api.nvim_set_current_win(prev_win)
+          vim.cmd 'vsplit'
+          local dummy_win = vim.api.nvim_get_current_win()
+          local dummy_buf = vim.api.nvim_create_buf(false, true)
+          vim.api.nvim_win_set_buf(dummy_win, dummy_buf)
+          vim.api.nvim_set_option_value('number', false, { win = dummy_win })
+          vim.api.nvim_set_option_value('relativenumber', false, { win = dummy_win })
+          vim.api.nvim_set_option_value('signcolumn', 'no', { win = dummy_win })
+          vim.api.nvim_win_set_width(prev_win, 120)
+          vim.api.nvim_set_current_win(prev_win)
         end, {})
+        vim.bo[ev.buf].textwidth = 120
         vim.cmd 'Toc'
       end,
     })
