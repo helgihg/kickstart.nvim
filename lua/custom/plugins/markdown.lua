@@ -33,7 +33,11 @@ return {
           vim.api.nvim_set_current_win(prev_win)
         end, {})
         vim.bo[ev.buf].textwidth = 120
-        vim.cmd 'Toc'
+        vim.schedule(function()
+          if vim.api.nvim_buf_is_valid(ev.buf) then
+            vim.cmd 'Toc'
+          end
+        end)
       end,
     })
   end,
